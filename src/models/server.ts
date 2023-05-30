@@ -15,6 +15,7 @@ import routerEstudianteInscrito from '../routes/cursos/estudiante-inscrito.route
 import routerCursos from '../routes/cursos/curso.routes';
 import routerCategoria from '../routes/cursos/categoria.routes';
 import routerCategoriaCurso from '../routes/cursos/categoria-curso.routes';
+import { imagenesRouter } from '../routes/imagenes.routes';
 
 class Server {
   private app: express.Application;
@@ -36,6 +37,7 @@ class Server {
   }
 
   routes() {
+    this.app.use('/imagen', imagenesRouter);
     this.app.use('/api', routerUsuario);
     this.app.use('/api', routerEstudiante);
     this.app.use('/api', routerInstructor);
@@ -58,7 +60,7 @@ class Server {
 
   async dbConnect() {
     try {
-      await sequelize.sync({ force: true });
+      await sequelize.sync({ force: false });
     } catch (err) {
       console.log('Unable to connect to the database: ', err);
     }

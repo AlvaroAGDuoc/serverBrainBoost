@@ -26,6 +26,10 @@ export const Curso = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    foto: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     descuento: {
       type: DataTypes.INTEGER,
       allowNull: true,

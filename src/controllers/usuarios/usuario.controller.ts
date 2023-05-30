@@ -80,13 +80,13 @@ export const nuevoUsuario = async (req: Request, res: Response) => {
     });
     id = await Usuario.max('id');
 
-    if (perfil == 1) {
+    if (perfil === 'estudiante') {
       await Estudiante.create({
         usuarioId: id,
       });
     }
 
-    if (perfil == 2) {
+    if (perfil === 'instructor') {
       await Instructor.create({
         biografia,
         calificacion: 0,

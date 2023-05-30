@@ -22,6 +22,10 @@ export const Video = sequelize.define(
       type: DataTypes.INTEGER,
       defaultValue: 0,
     },
+    video: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
   },
   {
     tableName: 'video',
