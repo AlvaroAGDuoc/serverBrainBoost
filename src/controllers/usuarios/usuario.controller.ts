@@ -15,7 +15,7 @@ export const getUsuarios = async (req: Request, res: Response) => {
   }
 };
 
-export const login = async (req: Request, res: Response) => {
+export const loginUsuario = async (req: Request, res: Response) => {
   const { email, clave } = req.body;
 
   //Validamos si el usuario existe
@@ -35,11 +35,16 @@ export const login = async (req: Request, res: Response) => {
       msg: 'Email o clave incorrectos',
     });
   }
-  //Generamos token
 
+  const usuarioEnviar: any = await Usuario.findOne({
+    attributes: ['id', 'nombre', 'apellido', 'email'],
+    where: { email: email },
+  });
+
+  //Generamos token
   const token = jwt.sign(
     {
-      email: email,
+      usuario: usuarioEnviar,
     },
     process.env.SECRET_KEY || 'admin123'
   );

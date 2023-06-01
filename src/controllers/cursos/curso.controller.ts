@@ -31,15 +31,17 @@ export const getCursos = async (req: Request, res: Response) => {
 
 export const nuevoCurso = async (req: Request, res: Response) => {
   const { nombre, precio, descripcion, instructorId, categoriaId } = req.body;
-
   const foto = req.file?.path;
+  const insp = Number(instructorId);
+  console.log(insp);
   let id: number;
+
   try {
     await Curso.create({
       nombre,
       precio,
       descripcion,
-      instructorId,
+      instructorId: insp,
       foto,
     });
     id = await Curso.max('id');
