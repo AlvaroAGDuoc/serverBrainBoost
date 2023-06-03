@@ -29,6 +29,58 @@ export const getCursos = async (req: Request, res: Response) => {
   }
 };
 
+export const getCursosInstructor = async (req: Request, res: Response) => {
+  const id = req.params.id;
+
+  try {
+    const cursos = await Curso.findAll({
+      include: [
+        {
+          model: Instructor,
+          where: { id: id },
+          include: [
+            {
+              model: Usuario,
+            },
+          ],
+        },
+      ],
+    });
+    res.json(cursos);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error });
+  }
+};
+
+export const getCurso = async (req: Request, res: Response) => {
+  const id = req.params.id;
+
+  try {
+    const cursos = await Curso.findOne({
+      where: { id: id },
+      include: [
+        {
+          model: Video,
+        },
+        {
+          model: Instructor,
+
+          include: [
+            {
+              model: Usuario,
+            },
+          ],
+        },
+      ],
+    });
+    res.json(cursos);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error });
+  }
+};
+
 export const nuevoCurso = async (req: Request, res: Response) => {
   const { nombre, precio, descripcion, instructorId, categoriaId } = req.body;
   const foto = req.file?.path;

@@ -8,6 +8,6 @@ import upload from '../../libs/multer';
 const routerVideo = Router();
 
 routerVideo.get('/videos', getVideos);
-routerVideo.post('/video', upload.single('video'), postVideo);
+routerVideo.post('/video/:id', upload.single('video'), postVideo);
 
 export default routerVideo;

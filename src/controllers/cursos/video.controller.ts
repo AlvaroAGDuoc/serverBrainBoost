@@ -12,8 +12,9 @@ export const getVideos = async (req: Request, res: Response) => {
 };
 
 export const postVideo = async (req: Request, res: Response) => {
-  const { titulo, descripcion, cursoId } = req.body;
+  const { titulo, descripcion } = req.body;
 
+  const cursoId = req.params.id;
   const video = req.file?.path;
   try {
     await Video.create({
