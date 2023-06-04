@@ -1,14 +1,32 @@
-import { Request, Response } from 'express';
-import { Usuario } from '../../models/usuarios/usuario';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { Estudiante } from '../../models/usuarios/estudiante';
-import { Instructor } from '../../models/usuarios/instructor';
+import { Request, Response } from "express";
+import { Usuario } from "../../models/usuarios/usuario";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { Estudiante } from "../../models/usuarios/estudiante";
+import { Instructor } from "../../models/usuarios/instructor";
 
 export const getUsuarios = async (req: Request, res: Response) => {
   try {
     const usuarios = await Usuario.findAll();
     res.json(usuarios);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error });
+  }
+};
+
+export const getUsuario = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const usuario = await Usuario.findOne({
+      where: { id },
+      include: [
+        {
+          model: Instructor,
+        },
+      ],
+    });
+    res.json(usuario);
   } catch (error) {
     console.log(error);
     res.status(500).json({ error });
@@ -24,7 +42,7 @@ export const loginUsuario = async (req: Request, res: Response) => {
   });
   if (!usuario) {
     return res.status(400).json({
-      msg: 'Email o clave incorrectos',
+      msg: "Email o clave incorrectos",
     });
   }
   //Validamos password
@@ -32,12 +50,12 @@ export const loginUsuario = async (req: Request, res: Response) => {
   const claveValida = await bcrypt.compare(clave, usuario.clave);
   if (!claveValida) {
     return res.status(400).json({
-      msg: 'Email o clave incorrectos',
+      msg: "Email o clave incorrectos",
     });
   }
 
   const usuarioEnviar: any = await Usuario.findOne({
-    attributes: ['id', 'nombre', 'apellido', 'email'],
+    attributes: ["id", "nombre", "apellido", "email"],
     where: { email: email },
   });
 
@@ -46,7 +64,7 @@ export const loginUsuario = async (req: Request, res: Response) => {
     {
       usuario: usuarioEnviar,
     },
-    process.env.SECRET_KEY || 'admin123'
+    process.env.SECRET_KEY || "admin123"
   );
 
   res.json(token);
@@ -83,15 +101,15 @@ export const nuevoUsuario = async (req: Request, res: Response) => {
       fotografia,
       pais,
     });
-    id = await Usuario.max('id');
+    id = await Usuario.max("id");
 
-    if (perfil === 'estudiante') {
+    if (perfil === "estudiante") {
       await Estudiante.create({
         usuarioId: id,
       });
     }
 
-    if (perfil === 'instructor') {
+    if (perfil === "instructor") {
       await Instructor.create({
         biografia,
         calificacion: 0,
@@ -100,11 +118,38 @@ export const nuevoUsuario = async (req: Request, res: Response) => {
     }
   } catch (error) {
     res.status(400).json({
-      msg: 'Ocurrio un error ',
+      msg: "Ocurrio un error ",
       error,
     });
   }
   res.json({
     msg: `Usuario ${nombre} ${apellido} creado exitosamente`,
   });
+};
+
+export const modificarUsuario = async (req: Request, res: Response) => {
+  const { id, usuario } = req.body;
+
+  let fotografia = req.file?.path;
+
+  try {
+    await Usuario.update(
+      {
+        email: usuario.email,
+        telefono: usuario.telefono,
+        pais: usuario.pais,
+        fotografia: fotografia,
+      },
+      {
+        where: { id },
+      }
+    );
+    console.log("se hace el update si no es undefined");
+    res.json({ msg: "usuario actualizado con exito" });
+  } catch (error) {
+    res.status(400).json({
+      msg: "Ocurrio un error ",
+      error,
+    });
+  }
 };
