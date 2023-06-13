@@ -1,9 +1,9 @@
-import { Request, Response } from 'express';
-import { Usuario } from '../../models/usuarios/usuario';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { Estudiante } from '../../models/usuarios/estudiante';
-import { Instructor } from '../../models/usuarios/instructor';
+import { Request, Response } from "express";
+import { Usuario } from "../../models/usuarios/usuario";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { Estudiante } from "../../models/usuarios/estudiante";
+import { Instructor } from "../../models/usuarios/instructor";
 
 export const getUsuarios = async (req: Request, res: Response) => {
   try {
@@ -42,7 +42,7 @@ export const loginUsuario = async (req: Request, res: Response) => {
   });
   if (!usuario) {
     return res.status(400).json({
-      msg: 'Email o clave incorrectos',
+      msg: "Email o clave incorrectos",
     });
   }
   //Validamos password
@@ -50,12 +50,12 @@ export const loginUsuario = async (req: Request, res: Response) => {
   const claveValida = await bcrypt.compare(clave, usuario.clave);
   if (!claveValida) {
     return res.status(400).json({
-      msg: 'Email o clave incorrectos',
+      msg: "Email o clave incorrectos",
     });
   }
 
   const usuarioEnviar: any = await Usuario.findOne({
-    attributes: ['id', 'nombre', 'apellido', 'email'],
+    attributes: ["id", "nombre", "apellido", "email"],
     where: { email: email },
   });
 
@@ -64,7 +64,7 @@ export const loginUsuario = async (req: Request, res: Response) => {
     {
       usuario: usuarioEnviar,
     },
-    process.env.SECRET_KEY || 'admin123'
+    process.env.SECRET_KEY || "admin123"
   );
 
   res.json(token);
@@ -101,15 +101,15 @@ export const nuevoUsuario = async (req: Request, res: Response) => {
       fotografia,
       pais,
     });
-    id = await Usuario.max('id');
+    id = await Usuario.max("id");
 
-    if (perfil === 'estudiante') {
+    if (perfil === "estudiante") {
       await Estudiante.create({
         usuarioId: id,
       });
     }
 
-    if (perfil === 'instructor') {
+    if (perfil === "instructor") {
       await Instructor.create({
         biografia,
         calificacion: 0,
@@ -118,7 +118,7 @@ export const nuevoUsuario = async (req: Request, res: Response) => {
     }
   } catch (error) {
     res.status(400).json({
-      msg: 'Ocurrio un error ',
+      msg: "Ocurrio un error ",
       error,
     });
   }
@@ -145,10 +145,50 @@ export const modificarUsuario = async (req: Request, res: Response) => {
         where: { id },
       }
     );
-    res.json({ msg: 'usuario actualizado con exito' });
+    res.json({ msg: "usuario actualizado con exito" });
   } catch (error) {
     res.status(400).json({
-      msg: 'Ocurrio un error ',
+      msg: "Ocurrio un error ",
+      error,
+    });
+  }
+};
+
+export const cambiarClave = async (req: Request, res: Response) => {
+  const { id, clave, claveNueva } = req.body;
+  console.log(clave);
+
+  //Validar si el usuario ya existe
+  const usuario: any = await Usuario.findOne({
+    where: { id: id },
+  });
+
+  if (!usuario) {
+    return res.status(400).json({
+      msg: `No existe un usuario con el id: ${id}`,
+    });
+  }
+  const claveValida = await bcrypt.compare(clave, usuario.clave);
+  if (!claveValida) {
+    return res.status(400).json({
+      msg: "Clave actual incorrecta, reintente.",
+    });
+  }
+  const hashedPassword = await bcrypt.hash(claveNueva, 10);
+
+  try {
+    await Usuario.update(
+      {
+        clave: hashedPassword,
+      },
+      {
+        where: { id },
+      }
+    );
+    res.json({ msg: "Tu contraseña ha sido modificada con éxito" });
+  } catch (error) {
+    res.status(400).json({
+      msg: "Ocurrio un error ",
       error,
     });
   }
