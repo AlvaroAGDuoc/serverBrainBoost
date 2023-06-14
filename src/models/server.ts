@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import sequelize from '../db/connection';
+import bodyParser from 'body-parser';
 import { PORT } from '../config';
 import routerUsuario from '../routes/usuarios/usuario.routes';
 import routerEstudiante from '../routes/usuarios/estudiante.routes';
@@ -56,6 +57,8 @@ class Server {
   middlewares() {
     this.app.use(express.json());
     this.app.use(cors());
+    this.app.use(bodyParser.json());
+    this.app.use(bodyParser.urlencoded({ extended: true }));
   }
 
   async dbConnect() {

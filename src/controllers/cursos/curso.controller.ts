@@ -6,8 +6,10 @@ import { Instructor } from '../../models/usuarios/instructor';
 import { Usuario } from '../../models/usuarios/usuario';
 
 export const getCursos = async (req: Request, res: Response) => {
+  const { estado } = req.params;
   try {
     const cursos = await Curso.findAll({
+      where: { estado: estado },
       include: [
         {
           model: Video,
@@ -23,6 +25,17 @@ export const getCursos = async (req: Request, res: Response) => {
       ],
     });
     res.json(cursos);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error });
+  }
+};
+
+export const aprobarCurso = async (req: Request, res: Response) => {
+  const { id } = req.body;
+  try {
+    await Curso.update({ estado: 1 }, { where: { id: id } });
+    res.json('Curso aprobado');
   } catch (error) {
     console.log(error);
     res.status(500).json({ error });
