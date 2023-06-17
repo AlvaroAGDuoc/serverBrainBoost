@@ -4,6 +4,8 @@ import { CategoriaCurso } from '../../models/cursos/categoria-curso';
 import { Video } from '../../models/cursos/video';
 import { Instructor } from '../../models/usuarios/instructor';
 import { Usuario } from '../../models/usuarios/usuario';
+import { Categoria } from '../../models/cursos/categoria';
+import { Valoracion } from '../../models/cursos/valoracion';
 
 export const getCursos = async (req: Request, res: Response) => {
   const { estado } = req.params;
@@ -66,11 +68,42 @@ export const getCursosInstructor = async (req: Request, res: Response) => {
   }
 };
 
+export const getCursosCategoria = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    const cursos = await Curso.findAll({
+      where: { estado: 1 },
+      include: [
+        {
+          model: Categoria,
+          where: { id: id },
+          through: {
+            attributes: ['id'],
+          },
+        },
+        {
+          model: Instructor,
+          include: [
+            {
+              model: Usuario,
+            },
+          ],
+        },
+      ],
+    });
+    res.json(cursos);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error });
+  }
+};
+
 export const getCurso = async (req: Request, res: Response) => {
   const id = req.params.id;
 
   try {
-    const cursos = await Curso.findOne({
+    const curso = await Curso.findOne({
       where: { id: id },
       include: [
         {
@@ -87,7 +120,20 @@ export const getCurso = async (req: Request, res: Response) => {
         },
       ],
     });
-    res.json(cursos);
+
+    const valoraciones = await Valoracion.findAll({
+      include: [
+        {
+          model: Usuario,
+        },
+        {
+          model: Curso,
+          attributes: ['id'],
+          where: { id: id },
+        },
+      ],
+    });
+    res.json({ curso, valoraciones });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error });
@@ -112,7 +158,7 @@ export const nuevoCurso = async (req: Request, res: Response) => {
     id = await Curso.max('id');
     await CategoriaCurso.create({
       cursoId: id,
-      categoriaId,
+      categoriumId: categoriaId,
     });
     res.json({
       msg: `Curso ${nombre}, creado exitosamente`,
