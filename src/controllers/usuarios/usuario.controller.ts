@@ -55,7 +55,7 @@ export const loginUsuario = async (req: Request, res: Response) => {
   }
 
   const usuarioEnviar: any = await Usuario.findOne({
-    attributes: ["id", "nombre", "apellido", "email"],
+    attributes: ["id", "nombre", "apellido", "email", "fotografia"],
     where: { email: email },
   });
 
@@ -145,7 +145,7 @@ export const modificarUsuario = async (req: Request, res: Response) => {
         where: { id },
       }
     );
-    res.json({ msg: "usuario actualizado con exito" });
+    res.json({ msg: "Usuario actualizado con exito" });
   } catch (error) {
     res.status(400).json({
       msg: "Ocurrio un error ",
