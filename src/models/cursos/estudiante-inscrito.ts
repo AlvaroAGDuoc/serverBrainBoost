@@ -2,6 +2,7 @@ import { DataTypes } from 'sequelize';
 import sequelize from '../../db/connection';
 import { Curso } from './curso';
 import { Estudiante } from '../usuarios/estudiante';
+import { Usuario } from '../usuarios/usuario';
 
 export const EstudianteInscrito = sequelize.define(
   'estudiante_inscrito',
@@ -22,10 +23,10 @@ export const EstudianteInscrito = sequelize.define(
   }
 );
 
-Curso.belongsToMany(Estudiante, {
+Curso.belongsToMany(Usuario, {
   through: EstudianteInscrito,
 });
 
-Estudiante.belongsToMany(Curso, {
+Usuario.belongsToMany(Curso, {
   through: EstudianteInscrito,
 });
