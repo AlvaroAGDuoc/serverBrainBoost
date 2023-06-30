@@ -1,5 +1,5 @@
-import { Request, Response } from 'express';
-import { Video } from '../../models/cursos/video';
+import { Request, Response } from "express";
+import { Video } from "../../models/cursos/video";
 
 export const getVideos = async (req: Request, res: Response) => {
   try {
@@ -24,10 +24,29 @@ export const postVideo = async (req: Request, res: Response) => {
       cursoId,
     });
     res.json({
-      msg: 'El video fue creado exitosamente',
+      msg: "El video fue creado exitosamente",
     });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error });
+  }
+};
+
+export const deleteVideo = async (req: Request, res: Response) => {
+  const { id } = req.body;
+
+  try {
+    await Video.destroy({
+      where: { id },
+    });
+
+    res.json({
+      msg: "Video eliminado correctamente",
+    });
+  } catch (error) {
+    res.status(400).json({
+      msg: "Ocurrio un error al eliminar el video",
+      error,
+    });
   }
 };
